@@ -1,0 +1,14 @@
+#
+# Copyright (C) 2016 McAfee, Inc.  All rights reserved.
+#
+
+[Unit]
+Description=McAfeeVSEForLinux daemon
+
+[Service]
+Type=forking
+ExecStart=<%= @install_dir %>/bin/nails.initd start
+ExecStop=<%= @install_dir %>/bin/nails.initd stop
+
+[Install]
+WantedBy=multi-user.target

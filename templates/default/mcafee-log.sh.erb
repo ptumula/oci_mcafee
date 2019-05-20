@@ -1,0 +1,39 @@
+#!/bin/bash
+
+# data center group
+dc_group=<%= @dc_group %>
+# retry count 
+COUNT=10
+
+if [ ${dc_group} == "bmc" ] || [ ${dc_group} == "oci2_0" ]; then
+  service cma status | head -2 | grep "already running" >> /dev/null
+  if [ $? -eq 0 ]; then
+    echo Mcafee Agent is running
+  else
+    echo No Mcafee Agent is running
+  fi
+  while true; do
+    <%= @agent_dir %>/bin/cmdagent -i|grep LastASCTime |grep N/A >>/dev/null
+    if [ $? -ne 0 ]; then
+      echo Mcafee agent is registered with Sec EPO
+      break
+    else
+      if  [ ${COUNT} -le 1 ]; then
+        <%= @agent_dir %>/bin/cmdagent -i
+        echo Mcafee Agent is not registered with Sec EPO
+        break
+      else
+        COUNT=`expr $COUNT - 1`
+        sleep 40
+        continue
+      fi
+    fi
+  done
+else
+  service nails status | head -1 | grep "is running" >> /dev/null && service cma status | head -2 | grep "already running" >> /dev/null
+  if [ $? -eq 0 ]; then
+    echo Mcafee Agent is running
+  else
+    echo No Mcafee Agent is running
+  fi
+fi

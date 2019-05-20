@@ -1,0 +1,32 @@
+@echo off
+
+SET COUNT=10
+SC QUERY <%= @service_name %> | FINDSTR "RUNNING" 2>delme.err  >delme.info
+IF %ERRORLEVEL% == 0 ( 
+
+ECHO <%= @service_name_ape %> is running 
+<% if @dc_group == "oci2_0" || @dc_group == "bmc"  %>
+:checkReg
+"C:\Program Files\McAfee\Agent\cmdagent.exe" /i |FINDSTR "LastASCTime" |FINDSTR "N/A" 2>delme.err  >delme.info
+IF NOT %ERRORLEVEL% == 0 ( 
+        ECHO Mcafee agent is registered with Sec EPO
+	goto :eof 
+) ELSE ( 
+	@SET /A COUNT=%COUNT%-1
+	SLEEP 40
+	IF %COUNT% LEQ 1 (
+		"C:\Program Files\McAfee\Agent\cmdagent.exe" /i 
+        echo Mcafee Agent is not registered with Sec EPO
+		goto :eof
+	)
+	goto :checkReg
+) 
+<% end %> 
+) ELSE ( 
+
+ECHO <%= @service_name_ape %> not running 
+
+)
+
+:eof 
+DEL /f delme.err delme.info

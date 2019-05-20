@@ -1,0 +1,14 @@
+#
+# Copyright (C) 2016 McAfee, Inc.  All rights reserved.
+#
+
+[Unit]
+Description=cma service
+
+[Service]
+Type=forking
+ExecStart=/etc/init.d/ma start
+ExecStop=/etc/init.d/ma stop
+
+[Install]
+WantedBy=multi-user.target
